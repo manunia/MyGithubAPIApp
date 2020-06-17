@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">My Github API App</string>
+    <string name="login">login</string>
+    <string name="followers">followers</string>
+    <string name="biography">biography</string>
+    <string name="full_name">full name</string>
+    <string name="created">created</string>
+    <string name="company">company</string>
+    <string name="email">email</string>
+    <string name="button">OK</string>
+    <string name="incorrect_name">User is not exists!</string>
+</resources>

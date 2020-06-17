@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Github API App</string>
+    <string name="login">логин</string>
+    <string name="followers">фоловерров</string>
+    <string name="biography">биграфия</string>
+    <string name="full_name">полное имя</string>
+    <string name="created">создан</string>
+    <string name="company">компания</string>
+    <string name="email">email</string>
+    <string name="button">OK</string>
+    <string name="incorrect_name">Пользователь не существует!</string>
+</resources>
