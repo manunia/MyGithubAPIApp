@@ -5,17 +5,14 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 
-import java.util.List;
-
+import ru.marial.mygithubapiapp.App;
 import ru.marial.mygithubapiapp.R;
+import ru.marial.mygithubapiapp.dao.UserDao;
 import ru.marial.mygithubapiapp.dao.UsersDataSource;
 import ru.marial.mygithubapiapp.httpsConnection.RetrofitConnection;
-import ru.marial.mygithubapiapp.model.Users;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RetrofitConnection connection;
 
-    private int load_users = 15;
-    private int load_more_users = 10;
+    private int per_page = 3;
+    private int since = 0;
 
     private final String BASE_URL = "https://api.github.com";
 
@@ -37,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
         connection = new RetrofitConnection();
         connection.initRetrofit(BASE_URL);
-        connection.requestAllUsers(load_users,MainActivity.this);
-
-        dataSource = connection.getDataSource();
 
         initList();
     }
@@ -52,8 +46,20 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
 
+        UserDao userDao = App.getInstsnce().getUserDao();
+        dataSource = new UsersDataSource(userDao);
+
+        connection.requestAllUsers(per_page, since, MainActivity.this, dataSource);
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         adapter = new ListAdapter(dataSource, this);
         recyclerView.setAdapter(adapter);
+
 
         DividerItemDecoration itemDecoration = new DividerItemDecoration(this,LinearLayoutManager.VERTICAL);
         itemDecoration.setDrawable(getDrawable(R.drawable.separator));
@@ -69,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                connection.requestAllUsers(load_more_users,MainActivity.this);
+                since +=per_page;
+                connection.requestAllUsers(per_page,since,MainActivity.this,dataSource);
+
             }
         });
         return adapter;

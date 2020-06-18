@@ -13,4 +13,9 @@ public class User {
     public String login;
     @ColumnInfo(name = "avatar")
     public String avatar;
+
+    public User(String login, String avatar) {
+        this.login = login;
+        this.avatar = avatar;
+    }
 }

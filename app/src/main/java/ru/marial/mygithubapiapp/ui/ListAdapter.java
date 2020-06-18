@@ -16,8 +16,8 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import ru.marial.mygithubapiapp.R;
+import ru.marial.mygithubapiapp.dao.User;
 import ru.marial.mygithubapiapp.dao.UsersDataSource;
-import ru.marial.mygithubapiapp.model.Users;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
@@ -50,12 +50,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ListAdapter.ViewHolder holder, int i) {
-        List<Users> users = datasourse.getUsers();
-        Users oneOfUsers = users.get(i);
+        List<User> users = datasourse.getUsers();
+        User oneOfUsers = users.get(i);
 
-        holder.userName.setText(oneOfUsers.getLogin());
+        holder.userName.setText(oneOfUsers.login);
         Picasso.get()
-                .load(oneOfUsers.getAvatar()).into(holder.avatar);
+                .load(oneOfUsers.avatar).into(holder.avatar);
 
         if (activity != null) {
             activity.registerForContextMenu(holder.cardView);
@@ -98,7 +98,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
                     if (adapterPosition == RecyclerView.NO_POSITION) return;
 
-                    listener.onItemClick(v, getDatasourse().getUsers().get(adapterPosition).getLogin(), adapterPosition);
+                    listener.onItemClick(v, getDatasourse().getUsers().get(adapterPosition).login, adapterPosition);
                 }
             });
         }

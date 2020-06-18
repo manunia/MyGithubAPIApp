@@ -11,7 +11,7 @@ import ru.marial.mygithubapiapp.model.Users;
 
 public interface OpenAllUsers {
     @GET("/users")
-    Call<List<Users>> loadAllUsers(@Query("per_page") int per_page);
+    Call<List<Users>> loadAllUsers(@Query("per_page") int per_page, @Query("since") int since);
 
     @GET("/users/{login}")
     Call<UserRequest> loadUserRequest(@Path("login") String login);

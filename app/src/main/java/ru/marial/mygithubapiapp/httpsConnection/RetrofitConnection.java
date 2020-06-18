@@ -16,6 +16,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.marial.mygithubapiapp.Constants;
+import ru.marial.mygithubapiapp.dao.User;
 import ru.marial.mygithubapiapp.dao.UsersDataSource;
 import ru.marial.mygithubapiapp.model.UserRequest;
 import ru.marial.mygithubapiapp.model.Users;
@@ -25,12 +26,12 @@ public class RetrofitConnection {
 
     private static final String TAG = "USERS";
     private OpenAllUsers openAllUsers;
-    private UsersDataSource dataSource;
+
     private String userLogin;
 
     public void initRetrofit(String baseUrl) {
         Retrofit retrofit;
-        dataSource = new UsersDataSource();
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -38,18 +39,14 @@ public class RetrofitConnection {
         openAllUsers = retrofit.create(OpenAllUsers.class);
     }
 
-    public void requestAllUsers(int per_page, Context context) {
-        openAllUsers.loadAllUsers(per_page)
+    public void requestAllUsers(int per_page, int since, Context context, UsersDataSource source) {
+        openAllUsers.loadAllUsers(per_page, since)
                 .enqueue(new Callback<List<Users>>() {
                     @Override
                     public void onResponse(Call<List<Users>> call, Response<List<Users>> response) {
                         if (response.body() != null && response.isSuccessful()) {
                             Log.e(TAG, response.body().toString());
-                            for (Users u : response.body()) {
-                                createUsers(u.getLogin(), u.getId(), u.getUrl(), u.getAvatar());
-                                setUserLogin(u.getLogin());
-                                Log.e(TAG, u.getLogin());
-                            }
+                            saveResponseIntoDataBase(response, source);
                         }
                         if (!response.isSuccessful() && response.errorBody() != null) {
                             showErrorMessage(response, context);
@@ -89,6 +86,8 @@ public class RetrofitConnection {
                 });
     }
 
+
+
     private void showErrorMessage(Response response, Context context) {
         try {
             JSONObject jsonError = new JSONObject(response.errorBody().string());
@@ -102,21 +101,12 @@ public class RetrofitConnection {
         }
     }
 
-    public void createUsers(String login, long id, String url, String avatar) {
-        Users users = new Users(login, id, url, avatar);
+    private void saveResponseIntoDataBase(Response<List<Users>> response, UsersDataSource source) {
+        for (Users u : response.body()) {
+            User newUser = new User(u.getLogin(),u.getAvatar());
+            source.addUser(newUser);
+            Log.e(TAG, u.getLogin());
+        }
 
-        dataSource.addUsers(users);
-    }
-
-    public UsersDataSource getDataSource() {
-        return dataSource;
-    }
-
-    public String getUserLogin() {
-        return userLogin;
-    }
-
-    public void setUserLogin(String userLogin) {
-        this.userLogin = userLogin;
     }
 }

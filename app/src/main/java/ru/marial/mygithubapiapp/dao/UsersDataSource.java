@@ -1,30 +1,51 @@
 package ru.marial.mygithubapiapp.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import ru.marial.mygithubapiapp.model.Users;
-
 public class UsersDataSource {
-    private List<Users> users;
 
+    private final UserDao userDao;
 
-    public UsersDataSource() {
-        users = new ArrayList<>();
+    private List<User> users;
 
+    public UsersDataSource(UserDao userDao) {
+        this.userDao = userDao;
     }
 
-    public List<Users> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void addUsers(Users user) {
-        users.add(user);
+    public boolean isUserExistsinDatabase(String login) {
+        if (users != null) {
+            for (User u:users) {
+                if (u.login.equals(login)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void loadUsers() {
+        users = userDao.getAllUsers();
     }
 
     public long getCountUsers() {
-        if (users !=null) {
-            return users.size();
-        } else return 0;
+        return userDao.getCountUsers();
+    }
+
+    public void addUser(User user) {
+        userDao.insertUser(user);
+        loadUsers();// После изменения БД надо повторно прочесть данные из буфера
+    }
+
+    public void updateUser(User user) {
+        userDao.updateUser(user);
+        loadUsers();
+    }
+
+    public void removeUser(long id) {
+        userDao.deleteUserById(id);
     }
 }
