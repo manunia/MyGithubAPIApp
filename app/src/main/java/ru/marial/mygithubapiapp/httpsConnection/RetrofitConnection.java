@@ -25,12 +25,10 @@ public class RetrofitConnection {
 
     private static final String TAG = "USERS";
     private OpenAllUsers openAllUsers;
-    private UsersDataSource dataSource;
-    private String userLogin;
 
     public void initRetrofit(String baseUrl) {
         Retrofit retrofit;
-        dataSource = new UsersDataSource();
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -38,16 +36,15 @@ public class RetrofitConnection {
         openAllUsers = retrofit.create(OpenAllUsers.class);
     }
 
-    public void requestAllUsers(int per_page, Context context) {
+    public void requestAllUsers(int per_page, Context context, UsersDataSource source) {
         openAllUsers.loadAllUsers(per_page)
                 .enqueue(new Callback<List<Users>>() {
                     @Override
                     public void onResponse(Call<List<Users>> call, Response<List<Users>> response) {
                         if (response.body() != null && response.isSuccessful()) {
-                            Log.e(TAG, response.body().toString());
                             for (Users u : response.body()) {
-                                createUsers(u.getLogin(), u.getId(), u.getUrl(), u.getAvatar());
-                                setUserLogin(u.getLogin());
+                                Users users = new Users(u.getLogin(), u.getId(), u.getUrl(), u.getAvatar());
+                                source.addUsers(users);
                                 Log.e(TAG, u.getLogin());
                             }
                         }
@@ -65,6 +62,34 @@ public class RetrofitConnection {
 
                 });
     }
+
+    public void requestSinceUsers(int since, Context context, UsersDataSource source) {
+        openAllUsers.loadSinceUsers(since)
+                .enqueue(new Callback<List<Users>>() {
+                    @Override
+                    public void onResponse(Call<List<Users>> call, Response<List<Users>> response) {
+                        if (response.body() != null && response.isSuccessful()) {
+                            for (Users u : response.body()) {
+                                Users users = new Users(u.getLogin(), u.getId(), u.getUrl(), u.getAvatar());
+                                source.addUsers(users);
+                                Log.e(TAG, u.getLogin());
+                            }
+                        }
+                        if (!response.isSuccessful() && response.errorBody() != null) {
+                            showErrorMessage(response, context);
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Users>> call, Throwable t) {
+                        new MyAlertDialogBuilder(context, "Exception!", "Fail connection").build();
+                        Log.e(TAG, "Fail connection", t);
+                    }
+
+                });
+    }
+
 
     public void requestOneUser(String login, Context context) {
         openAllUsers.loadUserRequest(login)
@@ -89,6 +114,8 @@ public class RetrofitConnection {
                 });
     }
 
+
+
     private void showErrorMessage(Response response, Context context) {
         try {
             JSONObject jsonError = new JSONObject(response.errorBody().string());
@@ -100,23 +127,5 @@ public class RetrofitConnection {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void createUsers(String login, long id, String url, String avatar) {
-        Users users = new Users(login, id, url, avatar);
-
-        dataSource.addUsers(users);
-    }
-
-    public UsersDataSource getDataSource() {
-        return dataSource;
-    }
-
-    public String getUserLogin() {
-        return userLogin;
-    }
-
-    public void setUserLogin(String userLogin) {
-        this.userLogin = userLogin;
     }
 }

@@ -1,7 +1,6 @@
 package ru.marial.mygithubapiapp.ui;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +43,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         if (itemClickListener != null) {
             vh.setOnClickListener(itemClickListener);
         }
-        Log.e("Adapter", "onCreateViewHolder");
         return vh;
     }
 
@@ -60,8 +58,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         if (activity != null) {
             activity.registerForContextMenu(holder.cardView);
         }
-
-        Log.e("Adapter", "onBindViewHolder");
     }
 
     @Override

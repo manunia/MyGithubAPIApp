@@ -13,6 +13,9 @@ public interface OpenAllUsers {
     @GET("/users")
     Call<List<Users>> loadAllUsers(@Query("per_page") int per_page);
 
+    @GET("/users")
+    Call<List<Users>> loadSinceUsers(@Query("since") int since);
+
     @GET("/users/{login}")
     Call<UserRequest> loadUserRequest(@Path("login") String login);
 }

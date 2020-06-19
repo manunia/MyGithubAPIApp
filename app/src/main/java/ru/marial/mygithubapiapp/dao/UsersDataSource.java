@@ -6,6 +6,7 @@ import java.util.List;
 import ru.marial.mygithubapiapp.model.Users;
 
 public class UsersDataSource {
+
     private List<Users> users;
 
 
@@ -27,4 +28,5 @@ public class UsersDataSource {
             return users.size();
         } else return 0;
     }
+
 }
